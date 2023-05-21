@@ -37,11 +37,15 @@ const Admission = require('./routes/Admission')
 const Admin = require('./routes/Admin')
 const Subject = require('./routes/Subject')
 const Student = require('./routes/Student')
+const Enrollment = require('./routes/Enrollment')
+const Programs = require('./routes/Programs')
 
 app.use('/api/admission', Admission)
 app.use('/api/admin', Admin)
 app.use('/api/subject', Subject)
 app.use('/api/student', Student)
+app.use('/api/enrollment', Enrollment)
+app.use('/api/program', Programs)
 
 
 app.listen(3000, function() {

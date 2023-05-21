@@ -12,14 +12,11 @@ const shortUUID = require("short-uuid");
 const admissionFields = [
   check("first_name").notEmpty().withMessage("First Name must have value").escape(),
   check("last_name").notEmpty().withMessage("Last name must have value").escape(),
-  check("middle_name").notEmpty().withMessage("Middle name must have value").escape(),
   check("gender").notEmpty().withMessage("Gender must have value").escape(),
   check("dob").notEmpty().withMessage("Date of Birth must have value").isISO8601().withMessage("Date of Birth must be a date").escape(),
   check("pob").notEmpty().withMessage("Place of Birth must have value").escape(),
   check("nationality").notEmpty().withMessage("Nationality must have value").escape(),
   check("civil_status").notEmpty().withMessage("Civil Status must have value").escape(),
-  check("religion").notEmpty().withMessage("Religion must have value").escape(),
-  check("tribe").notEmpty().withMessage("Tribe must have value").escape(),
   check("current_street").notEmpty().withMessage("Current Street must have value").escape(),
   check("current_barangay").notEmpty().withMessage("Current Barangay must have value").escape(),
   check("current_province").notEmpty().withMessage("Current Province must have value").escape(),
@@ -200,6 +197,7 @@ router.post(
       date_now,
       date_now,
     ];
+
 
     await conn.connect((err) => {
       if (err) throw err;

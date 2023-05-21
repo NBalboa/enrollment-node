@@ -27,13 +27,13 @@ router.post('/add_subject', subjectValidations ,function(req,res){
     const db = new Database();
     const conn = db.connection;
 
-    const {subject_code, subject_description, unit} = req.body;
+    const {subject_id, subject_code, subject_description, type, unit} = req.body;
 
     date_now = date = new Date().toISOString().slice(0, 19).replace("T", " ");
 
-    const query = "INSERT INTO subjects (subject_code, subject_description, unit, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
+    const query = "INSERT INTO subjects (subject_id,subject_code, subject_description, type , unit, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?,?)";
 
-    const values = [subject_code, subject_description, unit, date_now, date_now];
+    const values = [subject_id,subject_code, subject_description, type, unit, date_now, date_now];
 
     conn.connect( function isConnect(err){
         if (err) throw err;
@@ -100,13 +100,13 @@ router.put('/update_subject/:id', function(req,res){
     const db = new Database();
     const conn = db.connection;
 
-    const {subject_code, subject_description, unit} = req.body;
+    const {subject_id, subject_code, subject_description, unit} = req.body;
     const id = req.params.id;
 
     date_now = date = new Date().toISOString().slice(0, 19).replace("T", " ");
 
-    const query = "UPDATE subjects SET subject_code = ?, subject_description = ?, unit = ?, updated_at = ? WHERE id = ?";
-    const values = [subject_code, subject_description, unit, date_now, id];
+    const query = "UPDATE subjects SET subject_id = ?, subject_code = ?, subject_description = ?, unit = ?, updated_at = ? WHERE id = ?";
+    const values = [subject_id,subject_code, subject_description, unit, date_now, id];
 
     conn.connect( function isConnect(err){
         if(err) throw err;
@@ -173,11 +173,82 @@ router.get('/search_subject/:type/:keyword', function(req,res){
             });
         });
     }
+})
+
+router.post('/add_subjects_history', function(req, res){
+
+    const db = new Database();
+    const conn = db.connection;
+
+    const {test_values} = req.body;
+
+    console.log(test_values)
+
+    // const query =
+    //   "INSERT INTO histories (subject_id, student_id, sem, ay, level, created_at, updated_at) VALUES (?,?,?,?,?,?,?)";
 
 
+    const columns = [
+      "subject_id",
+      "student_id",
+      "sem",
+      "ay",
+      "level",
+      "created_at",
+      "updated_at",
+    ];
 
+    // Construct the placeholders string dynamically based on the number of columns
+    const placeholders = test_values
+      .map(() => "(" + columns.map(() => "?").join(", ") + ")")
+      .join(", ");
 
+    // Flatten the test_values array to a single-level array
+    const flatValues = test_values.flat();
+
+    // Construct the query dynamically
+    const query = `INSERT INTO histories (${columns.join(
+      ", "
+    )}) VALUES ${placeholders}`;
     
+    // console.log(flatValues)
+
+    // res.send(query);
+
+    conn.connect(function isConnect(err) {
+      if (err) throw err;
+      conn.query(query, flatValues, function (err, result) {
+        if (err) throw err;
+        console.log(result)
+        res.json({ data: "Success" });
+      });
+    });
+
+})
+
+
+router.get("/get_subjects_history/:student_id", function (req, res){
+
+    const db = new Database();
+    const conn = db.connection;
+
+    const student_id = req.params.student_id;
+
+    const query = "SELECT histories.created_at, histories.id, subjects.subject_id, subjects.subject_code, subject_description, subjects.unit, subjects.type, sem, ay, level FROM histories LEFT JOIN students ON histories.student_id = students.id LEFT JOIN subjects ON histories.subject_id = subjects.id WHERE students.id = ? ORDER BY histories.created_at DESC"
+
+    conn.connect(function isConnect(err) {
+        if (err) throw err;
+        conn.query(query, [student_id], function (err, result) {
+            if (err) throw err;
+            if(result.length === 0){
+                res.json({data: "No result found"})
+            }
+            else{
+                res.json({ data: result });
+            }
+        });
+        }
+    );
 
 })
 
